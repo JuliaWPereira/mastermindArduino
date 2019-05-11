@@ -1,5 +1,14 @@
+/*
+  Jogo Mastermind
+  O projeto consiste na implementação do jogo Mastermind, versão single e multi player
+  
+  created April 2019
+  by Júlia Wotzasek Pereira
+*/
+
+
+
 // Bibliotecas Utilizadas
-#include <math.h>
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
 #include <Keypad.h>
@@ -7,15 +16,15 @@
 LiquidCrystal_I2C lcd(0x27,16,2);
 
 // Definição das constantes referentes aos componetes do circuito
-const int ledRed1 = 22;
-const int ledRed2 = 24;
-const int ledRed3 = 26;
-const int ledRed4 = 28;
+const int ledGreen1 = 22;
+const int ledGreen2 = 24;
+const int ledGreen3 = 26;
+const int ledGreen4 = 28;
 
-const int ledGreen1 = 36;
-const int ledGreen2 = 38;
-const int ledGreen3 = 40;
-const int ledGreen4 = 42;
+const int ledWhite1 = 36;
+const int ledWhite2 = 38;
+const int ledWhite3 = 40;
+const int ledWhite4 = 42;
 
 const int buzzer = 8;
 const int melodyPin = 8;
@@ -64,7 +73,7 @@ int tempo[] = {
 int senhaParam[4] = {1,3,2,1};
 int senhaDigitada[4];
 int contadorReset = 3;
-int pretos = 0;
+int verdes = 0;
 int brancos = 0;
 int contadorJogadas = 9;
 int contadorJogadasReset = 9;
@@ -100,29 +109,29 @@ void buzz(int targetPin, long frequency, long length) {
   long numCycles = frequency * length / 1000; // calculate the number of cycles for proper timing
   for (long i = 0; i < numCycles; i++) { // for the calculated length of time...
     
-    digitalWrite(ledRed1,HIGH);
-    digitalWrite(ledRed2,HIGH);
-    digitalWrite(ledRed3,HIGH);
-    digitalWrite(ledRed4,HIGH);
-  
     digitalWrite(ledGreen1,HIGH);
     digitalWrite(ledGreen2,HIGH);
     digitalWrite(ledGreen3,HIGH);
     digitalWrite(ledGreen4,HIGH);
+  
+    digitalWrite(ledWhite1,HIGH);
+    digitalWrite(ledWhite2,HIGH);
+    digitalWrite(ledWhite3,HIGH);
+    digitalWrite(ledWhite4,HIGH);
 
     digitalWrite(targetPin,HIGH);
     delayMicroseconds(delayValue); // wait for the calculated delay value
     
-    digitalWrite(ledRed1,LOW);
-    digitalWrite(ledRed2,LOW);
-    digitalWrite(ledRed3,LOW);
-    digitalWrite(ledRed4,LOW);
-    digitalWrite(targetPin,LOW);
-  
     digitalWrite(ledGreen1,LOW);
     digitalWrite(ledGreen2,LOW);
     digitalWrite(ledGreen3,LOW);
     digitalWrite(ledGreen4,LOW);
+    digitalWrite(targetPin,LOW);
+  
+    digitalWrite(ledWhite1,LOW);
+    digitalWrite(ledWhite2,LOW);
+    digitalWrite(ledWhite3,LOW);
+    digitalWrite(ledWhite4,LOW);
   
     
     delayMicroseconds(delayValue); // wait again or the calculated delay value
@@ -134,25 +143,20 @@ boolean confereSenha(){
   int controleDigitada[4];
   int controleParametro[4];
   brancos = 0;
-  pretos = 0; 
+  verdes = 0; 
   for(int i = 0;i < 4;i++){
     controleDigitada[i] = 0;
     controleParametro[i] = 0;
   }
-
-  for(int i = 0;i < 4;i++){
-    Serial.print(senhaDigitada[i]);
-  }
-  Serial.println();
-  // testa as posições corretas
+ // testa as posições corretas
   for(int i = 0;i < 4;i++){
     if(senhaDigitada[i] == senhaParam[i]){
-      pretos++;
+      verdes++;
       controleDigitada[i] = 1;
       controleParametro[i] = 1;
     }
   }
-  if(pretos == 4){
+  if(verdes == 4){
     return true;
   }else{
    for(int i = 0;i < 4;i++){
@@ -192,13 +196,9 @@ void sorteiaSenha(){
     senha = nextSenha(senha);  
   }
   senhaParam[0] = senha/1000;
-  Serial.println(senhaParam[0]);
   senhaParam[1] = (senha/100)%10;
-  Serial.println(senhaParam[1]);
   senhaParam[2] = (senha/10)%10%10;
-  Serial.println(senhaParam[2]);
   senhaParam[3] = senha%1000%100%10;
-  Serial.println(senhaParam[3]);
   for(int i = 0;i < 4;i++){
     if(senhaParam[i] > 6){
       senhaParam[i] = senhaParam[i]%7;
@@ -206,10 +206,6 @@ void sorteiaSenha(){
       senhaParam[i] = i;
     }
   }
-  Serial.println(senhaParam[0]);
-  Serial.println(senhaParam[1]);
-  Serial.println(senhaParam[2]);
-  Serial.println(senhaParam[3]);
   sorteadorSenha++;
 }
 
@@ -417,59 +413,54 @@ int selecionaModo(){
 }
 
 void respondeJogada(){
-  if(pretos == 0){
-    digitalWrite(ledRed1,LOW);
-    digitalWrite(ledRed2,LOW);
-    digitalWrite(ledRed3,LOW);
-    digitalWrite(ledRed4,LOW);
-  } else if(pretos == 1){
-    digitalWrite(ledRed1,HIGH);
-    digitalWrite(ledRed2,LOW);
-    digitalWrite(ledRed3,LOW);
-    digitalWrite(ledRed4,LOW);
-  } else if(pretos == 2){
-    digitalWrite(ledRed1,HIGH);
-    digitalWrite(ledRed2,HIGH);
-    digitalWrite(ledRed3,LOW);
-    digitalWrite(ledRed4,LOW);
-  } else if(pretos == 3){
-    digitalWrite(ledRed1,HIGH);
-    digitalWrite(ledRed2,HIGH);
-    digitalWrite(ledRed3,HIGH);
-    digitalWrite(ledRed4,LOW);
-  }
-  
-  if(brancos == 0){
+  if(verdes == 0){
     digitalWrite(ledGreen1,LOW);
     digitalWrite(ledGreen2,LOW);
     digitalWrite(ledGreen3,LOW);
     digitalWrite(ledGreen4,LOW);
-  } else if(brancos == 1){
+  } else if(verdes == 1){
     digitalWrite(ledGreen1,HIGH);
     digitalWrite(ledGreen2,LOW);
     digitalWrite(ledGreen3,LOW);
     digitalWrite(ledGreen4,LOW);
-  } else if(brancos == 2){
+  } else if(verdes == 2){
     digitalWrite(ledGreen1,HIGH);
     digitalWrite(ledGreen2,HIGH);
     digitalWrite(ledGreen3,LOW);
     digitalWrite(ledGreen4,LOW);
-  } else if(brancos == 3){
+  } else if(verdes == 3){
     digitalWrite(ledGreen1,HIGH);
     digitalWrite(ledGreen2,HIGH);
     digitalWrite(ledGreen3,HIGH);
     digitalWrite(ledGreen4,LOW);
-  } else if(brancos == 4) {
-    digitalWrite(ledGreen1,HIGH);
-    digitalWrite(ledGreen2,HIGH);
-    digitalWrite(ledGreen3,HIGH);
-    digitalWrite(ledGreen4,HIGH);
   }
   
-  Serial.print("Pretos:");
-  Serial.println(pretos);
-  Serial.print("Brancos:");
-  Serial.println(brancos);
+  if(brancos == 0){
+    digitalWrite(ledWhite1,LOW);
+    digitalWrite(ledWhite2,LOW);
+    digitalWrite(ledWhite3,LOW);
+    digitalWrite(ledWhite4,LOW);
+  } else if(brancos == 1){
+    digitalWrite(ledWhite1,HIGH);
+    digitalWrite(ledWhite2,LOW);
+    digitalWrite(ledWhite3,LOW);
+    digitalWrite(ledWhite4,LOW);
+  } else if(brancos == 2){
+    digitalWrite(ledWhite1,HIGH);
+    digitalWrite(ledWhite2,HIGH);
+    digitalWrite(ledWhite3,LOW);
+    digitalWrite(ledWhite4,LOW);
+  } else if(brancos == 3){
+    digitalWrite(ledWhite1,HIGH);
+    digitalWrite(ledWhite2,HIGH);
+    digitalWrite(ledWhite3,HIGH);
+    digitalWrite(ledWhite4,LOW);
+  } else if(brancos == 4) {
+    digitalWrite(ledWhite1,HIGH);
+    digitalWrite(ledWhite2,HIGH);
+    digitalWrite(ledWhite3,HIGH);
+    digitalWrite(ledWhite4,HIGH);
+  }
 }
 
 void perdeJogo(){
@@ -482,67 +473,55 @@ void perdeJogo(){
   int frequencia = 0;
   for (frequencia = 150; frequencia < 1800; frequencia += 1){
     tone(buzzer, frequencia, tempo);
-    digitalWrite(ledRed1,HIGH);
-    digitalWrite(ledRed2,HIGH);
-    digitalWrite(ledRed3,HIGH);
-    digitalWrite(ledRed4,HIGH);
-  
     digitalWrite(ledGreen1,HIGH);
     digitalWrite(ledGreen2,HIGH);
     digitalWrite(ledGreen3,HIGH);
-    digitalWrite(ledGreen4,HIGH); 
+    digitalWrite(ledGreen4,HIGH);
+  
+    digitalWrite(ledWhite1,HIGH);
+    digitalWrite(ledWhite2,HIGH);
+    digitalWrite(ledWhite3,HIGH);
+    digitalWrite(ledWhite4,HIGH); 
     delay(1);
   }
   for (frequencia = 1800; frequencia > 150; frequencia -= 1){
     tone(buzzer, frequencia, tempo);
-    digitalWrite(ledRed1,HIGH);
-    digitalWrite(ledRed2,HIGH);
-    digitalWrite(ledRed3,HIGH);
-    digitalWrite(ledRed4,HIGH);
-  
     digitalWrite(ledGreen1,HIGH);
     digitalWrite(ledGreen2,HIGH);
     digitalWrite(ledGreen3,HIGH);
-    digitalWrite(ledGreen4,HIGH);  
+    digitalWrite(ledGreen4,HIGH);
+  
+    digitalWrite(ledWhite1,HIGH);
+    digitalWrite(ledWhite2,HIGH);
+    digitalWrite(ledWhite3,HIGH);
+    digitalWrite(ledWhite4,HIGH);  
     delay(1);
   }
-  digitalWrite(ledRed1,LOW);
-  digitalWrite(ledRed2,LOW);
-  digitalWrite(ledRed3,LOW);
-  digitalWrite(ledRed4,LOW);
-
   digitalWrite(ledGreen1,LOW);
   digitalWrite(ledGreen2,LOW);
   digitalWrite(ledGreen3,LOW);
-  digitalWrite(ledGreen4,LOW);  
+  digitalWrite(ledGreen4,LOW);
+
+  digitalWrite(ledWhite1,LOW);
+  digitalWrite(ledWhite2,LOW);
+  digitalWrite(ledWhite3,LOW);
+  digitalWrite(ledWhite4,LOW);  
   
   delay(1000);
 }
 
 void setup() {
-  Serial.begin(9600);
-//  pinMode(3, OUTPUT);
-//  pinMode(4, OUTPUT);
-//  pinMode(5, OUTPUT);
-//  pinMode(6, OUTPUT);
-//   
-//  //Pinos ligados aos pinos 5, 6, 7 e 8 do teclado - Colunas
-//  pinMode(8, INPUT);
-//  pinMode(9, INPUT);
-//  pinMode(10, INPUT);
-//  pinMode(11, INPUT);
-
-  //Leds de resposta
-  pinMode(ledRed1,OUTPUT);
-  pinMode(ledRed2,OUTPUT);
-  pinMode(ledRed3,OUTPUT);
-  pinMode(ledRed4,OUTPUT);
-
   //Leds de resposta
   pinMode(ledGreen1,OUTPUT);
   pinMode(ledGreen2,OUTPUT);
   pinMode(ledGreen3,OUTPUT);
   pinMode(ledGreen4,OUTPUT);
+
+  //Leds de resposta
+  pinMode(ledWhite1,OUTPUT);
+  pinMode(ledWhite2,OUTPUT);
+  pinMode(ledWhite3,OUTPUT);
+  pinMode(ledWhite4,OUTPUT);
 
   // Buzzer
   pinMode(buzzer,OUTPUT);
